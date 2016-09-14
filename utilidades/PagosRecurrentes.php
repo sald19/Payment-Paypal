@@ -80,7 +80,7 @@ class PagosRecurrentes
     public function actualizarPlan($planCreado)
     {
         if (!$planCreado->id) {
-            return null;
+            return;
         }
 
         try {
