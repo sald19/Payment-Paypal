@@ -7,14 +7,13 @@ class PaymentController extends BaseController
 {
     protected $pagosRecurrentes;
 
-    public function __construct ()
+    public function __construct()
     {
         $this->pagosRecurrentes = new PagosRecurrentes();
     }
 
     public function crearPlan()
     {
-
         $this->pagosRecurrentes->crearPlan();
 
         return $this->pagosRecurrentes->crearAcuerdoDeFacturacion();
@@ -23,6 +22,7 @@ class PaymentController extends BaseController
     public function pagoSatifactorio()
     {
         $token = Input::get('token');
+
         return $this->pagosRecurrentes->ejecutarAcuerdo($token);
     }
 }

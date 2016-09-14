@@ -11,12 +11,11 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
+Route::get('/', function () {
+    return View::make('hello');
 });
 
 Route::group(['prefix' => 'paypal'], function () {
-    Route::get('/create-plan-regular','PaymentController@crearPlan');
-    Route::get('/payment-success','PaymentController@pagoSatifactorio');
+    Route::get('/create-plan-regular', 'PaymentController@crearPlan');
+    Route::get('/payment-success', 'PaymentController@pagoSatifactorio');
 });

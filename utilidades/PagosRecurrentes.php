@@ -19,8 +19,8 @@ use PayPal\Rest\ApiContext;
 
 class PagosRecurrentes
 {
-    private  $paypal_config;
-    private  $api_context;
+    private $paypal_config;
+    private $api_context;
     private $planCreado;
     private $agreement;
     public $fechaDeCreacion;
@@ -56,18 +56,18 @@ class PagosRecurrentes
         $definicionDePago->setName('Regular Payments')
             ->setType('REGULAR')
             ->setFrequency('Month')
-            ->setFrequencyInterval("1")
-            ->setCycles("0")
-            ->setAmount(new Currency(array('value' => 60, 'currency' => 'USD')));
+            ->setFrequencyInterval('1')
+            ->setCycles('0')
+            ->setAmount(new Currency(['value' => 60, 'currency' => 'USD']));
 
         $preferenciaDeComerciante = new MerchantPreferences();
         $baseUrl = 'http://localhost:8000/';
 
-        $preferenciaDeComerciante->setReturnUrl($baseUrl. "paypal/payment-success")
-            ->setCancelUrl($baseUrl . "paypal/payment-cancel")
-            ->setAutoBillAmount("yes")
-            ->setInitialFailAmountAction("CONTINUE")
-            ->setMaxFailAttempts("0");
+        $preferenciaDeComerciante->setReturnUrl($baseUrl.'paypal/payment-success')
+            ->setCancelUrl($baseUrl.'paypal/payment-cancel')
+            ->setAutoBillAmount('yes')
+            ->setInitialFailAmountAction('CONTINUE')
+            ->setMaxFailAttempts('0');
 
         $plan->setPaymentDefinitions([$definicionDePago]);
         $plan->setMerchantPreferences($preferenciaDeComerciante);
@@ -83,32 +83,31 @@ class PagosRecurrentes
 
         $this->setPlanCreado($planActualizado);
 
-        return $this; 
+        return $this;
     }
 
     public function actualizarPlan($planCreado)
     {
         if ($planCreado->id) {
             try {
-               $patch = new Patch();
+                $patch = new Patch();
 
-               $value = new PayPalModel('{
+                $value = new PayPalModel('{
                 "state":"ACTIVE"
             }');
 
-               $patch->setOp('replace')
+                $patch->setOp('replace')
                    ->setPath('/')
                    ->setValue($value);
 
-               $patchRequest = new PatchRequest();
-               $patchRequest->addPatch($patch);
+                $patchRequest = new PatchRequest();
+                $patchRequest->addPatch($patch);
 
-               $planCreado->update($patchRequest, $this->api_context);
+                $planCreado->update($patchRequest, $this->api_context);
 
-               $planActualizado = Plan::get($planCreado->getId(), $this->api_context);
-
+                $planActualizado = Plan::get($planCreado->getId(), $this->api_context);
             } catch (\Exception $ex) {
-               echo $ex->getMessage();
+                echo $ex->getMessage();
                 exit(1);
             }
 
@@ -120,7 +119,7 @@ class PagosRecurrentes
     {
         $plan = $this->getPlanCreado();
 
-        if ($plan->state == "ACTIVE") {
+        if ($plan->state == 'ACTIVE') {
             $agreement = new Agreement();
 
             $agreement->setName('T-Shirt of the Month Club Agreement')
@@ -139,7 +138,7 @@ class PagosRecurrentes
             try {
                 $agreement = $agreement->create($this->api_context);
             } catch (Exception $ex) {
-                dd("Created Billing Agreement.", $ex->getMessage());
+                dd('Created Billing Agreement.', $ex->getMessage());
             }
 
 //            $params = array('page_size' => '20','status' => 'active');
@@ -166,7 +165,7 @@ class PagosRecurrentes
 
         return $agreement;
     }
-    
+
     /**
      * @param mixed $planCreado
      */
