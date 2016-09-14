@@ -1,8 +1,9 @@
 <?php
 
-namespace utilidades;
+namespace Utilidades;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use PayPal\Api\Agreement;
@@ -19,32 +20,24 @@ use PayPal\Rest\ApiContext;
 
 class PagosRecurrentes
 {
-    private $paypal_config;
-    private $api_context;
+    private $apiContext;
+
     private $planCreado;
-    private $agreement;
-    public $fechaDeCreacion;
 
     public function __construct()
     {
-        $this->paypal_config = Config::get('paypal');
+        $config = Config::get('paypal');
 
-        $this->api_context = new ApiContext(
-            new OAuthTokenCredential($this->paypal_config['client_id'], $this->paypal_config['secret'])
+        $this->apiContext = new ApiContext(
+            new OAuthTokenCredential($config['client_id'], $config['secret'])
         );
 
-        $this->api_context->setConfig($this->paypal_config['settings']);
-
-        $this->fechaDeCreacion = Carbon::now()->addMinute(5)->toIso8601String();
+        $this->apiContext->setConfig($config['settings']);
     }
 
     public function crearPlan()
     {
-        //Crea una instacia de la clase Plan
-
         $plan = new Plan();
-
-        //Informacion Basica del plan Recurrente
 
         $plan->setName('T-Shirt of the Month Club Plan')
             ->setDescription('Template creation.')
@@ -73,50 +66,47 @@ class PagosRecurrentes
         $plan->setMerchantPreferences($preferenciaDeComerciante);
 
         try {
-            $planCreado = $plan->create($this->api_context);
+            $planCreado = $plan->create($this->apiContext);
         } catch (Exception $x) {
             echo $x->getMessage();
             exit(1);
         }
 
-        $planActualizado = $this->actualizarPlan($planCreado);
-
-        $this->setPlanCreado($planActualizado);
+        $this->planCreado = $this->actualizarPlan($planCreado);
 
         return $this;
     }
 
     public function actualizarPlan($planCreado)
     {
-        if ($planCreado->id) {
-            try {
-                $patch = new Patch();
-
-                $value = new PayPalModel('{
-                "state":"ACTIVE"
-            }');
-
-                $patch->setOp('replace')
-                   ->setPath('/')
-                   ->setValue($value);
-
-                $patchRequest = new PatchRequest();
-                $patchRequest->addPatch($patch);
-
-                $planCreado->update($patchRequest, $this->api_context);
-
-                $planActualizado = Plan::get($planCreado->getId(), $this->api_context);
-            } catch (\Exception $ex) {
-                echo $ex->getMessage();
-                exit(1);
-            }
-
-            return $planActualizado;
+        if (!$planCreado->id) {
+            return null;
         }
+
+        try {
+            $value = new PayPalModel('{"state":"ACTIVE"}');
+
+            $patch = new Patch();
+            $patch->setOp('replace')
+                ->setPath('/')
+                ->setValue($value);
+
+            $patchRequest = new PatchRequest();
+            $patchRequest->addPatch($patch);
+
+            $planCreado->update($patchRequest, $this->apiContext);
+
+            $planActualizado = Plan::get($planCreado->getId(), $this->apiContext);
+        } catch (Exception $ex) {
+            dd($ex->getMessage());
+        }
+
+        return $planActualizado;
     }
 
     public function crearAcuerdoDeFacturacion()
     {
+        $fecha = Carbon::now()->addMinute(5)->toIso8601String();
         $plan = $this->getPlanCreado();
 
         if ($plan->state == 'ACTIVE') {
@@ -124,7 +114,7 @@ class PagosRecurrentes
 
             $agreement->setName('T-Shirt of the Month Club Agreement')
                 ->setDescription('Agreement for T-Shirt of the Month Club Plan')
-                ->setStartDate($this->fechaDeCreacion);
+                ->setStartDate($fecha);
 
             $setPlan = new Plan();
             $setPlan = $setPlan->setId($plan->getId());
@@ -136,14 +126,10 @@ class PagosRecurrentes
             $agreement->setPayer($payer);
 
             try {
-                $agreement = $agreement->create($this->api_context);
+                $agreement = $agreement->create($this->apiContext);
             } catch (Exception $ex) {
                 dd('Created Billing Agreement.', $ex->getMessage());
             }
-
-//            $params = array('page_size' => '20','status' => 'active');
-
-//            $planList = Plan::all($params, $this->api_context);
 
             return Redirect::to($agreement->getApprovalLink());
         }
@@ -156,12 +142,12 @@ class PagosRecurrentes
         try {
             // ## Execute Agreement
             // Execute the agreement by passing in the token
-            $agreement->execute($token, $this->api_context);
+            $agreement->execute($token, $this->apiContext);
         } catch (Exception $ex) {
             echo $ex->getMessage();
         }
 
-        $agreement = Agreement::get($agreement->getId(), $this->api_context);
+        $agreement = Agreement::get($agreement->getId(), $this->apiContext);
 
         return $agreement;
     }

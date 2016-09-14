@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Input;
-use utilidades\PagosRecurrentes;
+use Utilidades\PagosRecurrentes;
 
 class PaymentController extends BaseController
 {
