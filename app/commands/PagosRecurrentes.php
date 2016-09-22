@@ -69,18 +69,13 @@ class PagosRecurrentes
         }
 
         $preferenciaDeComerciante = new MerchantPreferences();
-        $baseUrl = 'http://localhost:8000/';
+        $baseUrl = url();
 
-        $preferenciaDeComerciante->setReturnUrl($baseUrl.'paypal/payment-success')
-            ->setCancelUrl($baseUrl.'paypal/payment-cancel')
+        $preferenciaDeComerciante->setReturnUrl($baseUrl.'/paypal/payment-success')
+            ->setCancelUrl($baseUrl.'/paypal/payment-cancel')
             ->setAutoBillAmount('yes')
             ->setInitialFailAmountAction('CONTINUE')
             ->setMaxFailAttempts('0');
-//            ->setSetupFee(new Currency(array('value' => 60, 'currency' => 'USD')));
-
-//        if(false) {
-//            $preferenciaDeComerciante->setSetupFee = new Currency(array('value' => 1, 'currency' => 'USD'));
-//        }
 
         $plan->setPaymentDefinitions($tiposDePAgos);
         $plan->setMerchantPreferences($preferenciaDeComerciante);

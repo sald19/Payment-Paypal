@@ -31,4 +31,10 @@ class PaymentController extends BaseController
 
         return $this->pagosRecurrentes->ejecutarAcuerdo($token);
     }
+
+    public function pagoCancelado()
+    {
+        $token = Input::get('token');
+        return "User Cancelled the Approval with token: ".$token;
+    }
 }
