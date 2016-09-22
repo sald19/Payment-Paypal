@@ -19,4 +19,6 @@ Route::group(['prefix' => 'paypal'], function () {
     Route::get('/crear-plan-regular', 'PaymentController@crearPlaRegular');
     Route::get('/crear-plan-trial', 'PaymentController@crearPlanTrial');
     Route::get('/payment-success', 'PaymentController@pagoSatifactorio');
+
+    Route::post('/ipn/listener', 'PaypalHookController@ipn');
 });
