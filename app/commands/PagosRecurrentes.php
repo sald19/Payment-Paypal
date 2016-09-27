@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use PayPal\Api\Agreement;
+use PayPal\Api\AgreementStateDescriptor;
 use PayPal\Api\Currency;
 use PayPal\Api\MerchantPreferences;
 use PayPal\Api\Patch;
@@ -76,11 +77,6 @@ class PagosRecurrentes
             ->setAutoBillAmount('yes')
             ->setInitialFailAmountAction('CONTINUE')
             ->setMaxFailAttempts('0');
-//            ->setSetupFee(new Currency(array('value' => 60, 'currency' => 'USD')));
-
-//        if(false) {
-//            $preferenciaDeComerciante->setSetupFee = new Currency(array('value' => 1, 'currency' => 'USD'));
-//        }
 
         $plan->setPaymentDefinitions($tiposDePAgos);
         $plan->setMerchantPreferences($preferenciaDeComerciante);
@@ -170,6 +166,18 @@ class PagosRecurrentes
         $agreement = Agreement::get($agreement->getId(), $this->apiContext);
 
         return $agreement;
+    }
+
+    public function cancelar($id)
+    {
+        $agreement = Agreement::get($id, $this->apiContext);
+
+        $descriptor = new AgreementStateDescriptor();
+        $descriptor->setNote('Suspending the agreement');
+
+        $agreement->cancel($descriptor, $this->apiContext);
+
+        return 'Agreement cancelado';
     }
 
     /**
