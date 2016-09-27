@@ -37,4 +37,11 @@ class PaymentController extends BaseController
         $token = Input::get('token');
         return "User Cancelled the Approval with token: ".$token;
     }
+
+    public function cancelar()
+    {
+        $BILLING_AGREEMENT_ID = 'I-HT38K76XPMGJ';
+
+        $this->pagosRecurrentes->cancelar();
+    }
 }

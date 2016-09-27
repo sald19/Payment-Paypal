@@ -20,7 +20,7 @@ Route::group(['prefix' => 'paypal'], function () {
     Route::get('/crear-plan-trial', 'PaymentController@crearPlanTrial');
     Route::get('/payment-success', 'PaymentController@pagoSatifactorio');
     Route::get('/payment-cancel', 'PaymentController@pagoCancelado');
-
+    Route::get('/subscription-cancel', 'PaymentController@cancelar');
 
     Route::post('/ipn/listener', 'PaypalHookController@ipn');
 });
