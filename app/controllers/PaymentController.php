@@ -11,34 +11,34 @@ class PaymentController extends BaseController
         $this->pagosRecurrentes = new \PagosRecurrentes();
     }
 
-    public function crearPlaRegular()
+    public function createRegularPlan()
     {
         $this->pagosRecurrentes->crearPlan();
 
         return $this->pagosRecurrentes->crearAcuerdoDeFacturacion();
     }
 
-    public function crearPlanTrial()
+    public function createTrialPlan()
     {
         $this->pagosRecurrentes->crearPlan('trial');
 
         return $this->pagosRecurrentes->crearAcuerdoDeFacturacion();
     }
 
-    public function pagoSatifactorio()
+    public function SuccessPayment()
     {
         $token = Input::get('token');
 
         return $this->pagosRecurrentes->ejecutarAcuerdo($token);
     }
 
-    public function pagoCancelado()
+    public function canceledPayment()
     {
         $token = Input::get('token');
         return "User Cancelled the Approval with token: ".$token;
     }
 
-    public function cancelar()
+    public function cancel()
     {
         $BILLING_AGREEMENT_ID = 'I-HT38K76XPMGJ';
 
