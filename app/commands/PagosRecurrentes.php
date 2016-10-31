@@ -33,7 +33,7 @@ class PagosRecurrentes
         $this->apiContext->setConfig($config['settings']);
     }
 
-    public function crearPlan($type = null)
+    public function CreatePlan($type = null)
     {
         $plan = new Plan();
 
@@ -93,7 +93,7 @@ class PagosRecurrentes
         return $this;
     }
 
-    public function actualizarPlan($planCreado)
+    public function updatePlan($planCreado)
     {
         if (!$planCreado->id) {
             return;
@@ -120,7 +120,7 @@ class PagosRecurrentes
         return $planActualizado;
     }
 
-    public function crearAcuerdoDeFacturacion()
+    public function createCancelBillingAgreement()
     {
         $fecha = Carbon::now()->addMinute(5)->toIso8601String();
         $plan = $this->getPlanCreado();
@@ -151,7 +151,7 @@ class PagosRecurrentes
         }
     }
 
-    public function ejecutarAcuerdo($token)
+    public function executeAgreement($token)
     {
         $agreement = new Agreement();
 
@@ -168,7 +168,7 @@ class PagosRecurrentes
         return $agreement;
     }
 
-    public function cancelar($id)
+    public function cancel($id)
     {
         $agreement = Agreement::get($id, $this->apiContext);
 
@@ -183,7 +183,7 @@ class PagosRecurrentes
     /**
      * @param mixed $planCreado
      */
-    public function setPlanCreado($planCreado)
+    public function setPlan($planCreado)
     {
         $this->planCreado = $planCreado;
     }
@@ -191,7 +191,7 @@ class PagosRecurrentes
     /**
      * @return mixed
      */
-    public function getPlanCreado()
+    public function getPlan()
     {
         return $this->planCreado;
     }
